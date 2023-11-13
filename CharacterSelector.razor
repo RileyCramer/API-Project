@@ -1,0 +1,54 @@
+﻿@page "/characterSelector"
+<h3>Character Selector :)</h3>
+
+
+<div>
+    @foreach (var character in Characters)
+    {
+        <button @onclick="() => SelectCharacter(character)">
+            @character.Name
+        </button>
+    }
+</div>
+
+@if (SelectedCharacter != null)
+{
+    <p>You selected: @SelectedCharacter.Name</p>
+    <p>Class: @SelectedCharacter.Class</p>
+}
+
+@code {
+    // Define a simple Character class
+    public class Character
+    {
+        public string Name { get; set; }
+        public string Class { get; set; } = "No Class";
+
+    }
+
+    // Define a list of characters
+    private List<Character> Characters = new List<Character>
+    {
+        new Character { Name = "Character 1", Class = "Barbarian" },
+        new Character { Name = "Character 2", Class = "Bard"},
+        new Character { Name = "Character 3", Class = "Cleric" },
+        new Character { Name = "Character 4", Class = "Druid" },
+        new Character { Name = "Character 5", Class = "Fighter" },
+        new Character { Name = "Character 6", Class = "Monk" },
+        new Character { Name = "Character 7", Class = "Paladin" },
+        new Character { Name = "Character 8", Class = "Ranger" },
+        new Character { Name = "Character 9", Class = "Rogue" },
+        new Character { Name = "Character 10", Class = "Sorcerer" },
+        new Character { Name = "Character 11", Class = "Warlock" },
+        new Character { Name = "Character 12", Class = "Wizard" }
+    };
+
+    // Track the selected character
+    private Character SelectedCharacter { get; set; }
+
+    // Method to handle character selection
+    private void SelectCharacter(Character character)
+    {
+        SelectedCharacter = character;
+    }
+}
