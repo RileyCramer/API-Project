@@ -5,7 +5,7 @@
 <div>
 
     <h3>Name</h3>
-    <input type="text" @bind="dndName" placeholder="Enter text" @onkeydown="@(e => {SelectCharacter();})" />
+    <input type="text" @bind="dndName" placeholder="Enter text" @onkeydown="@(e => {})" />
     <h3>Class</h3>
     <input type="text" @bind="dndClass" placeholder="Enter text" @onkeydown="@(e => {})" />
     <h3>Skills</h3>
@@ -17,6 +17,9 @@
     <h3>SubRaces</h3>
     <input type="text" @bind="dndSubRaces" placeholder="Enter text" @onkeydown="@(e => {})" />
 
+    <button @onclick="ToString">Display</button>
+
+    <p>@DisplayAll</p>
 
     @foreach (var character in Characters)
     {
@@ -41,7 +44,7 @@
     private string dndSubClasses = "";
     private string dndRaces = "";
     private string dndSubRaces = "";
-
+    private string DisplayAll;
     // Define a simple Character class
     public class Character
     {
@@ -78,4 +81,16 @@
     {
         SelectedCharacter = character;
     }
+
+    private void ToString()
+    {
+        DisplayAll = "";
+        DisplayAll += dndName +"\n";
+        DisplayAll += dndClass +"\n";
+        DisplayAll += dndSubClasses +"\n";
+        DisplayAll += dndRaces +"\n";
+        DisplayAll += dndSubRaces +"\n";
+        DisplayAll += dndSkills;
+    }
+
 }

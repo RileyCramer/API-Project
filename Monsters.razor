@@ -1,72 +1,32 @@
-﻿@page "/"
+@page "/Monster"
 
-<PageTitle>Index</PageTitle>
-
-
-
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<h1>Monster</h1>
 
 <h3>Input Data</h3>
 <input type="text" @bind="inputText" placeholder="Enter text" @onkeydown="@(e => { FetchDnD(); FetchDnDImage(); })" />
 
-
-
-
-<SurveyPrompt Title="How is Blazor working for you?" />
-
-@if(p != null)
-{
-	<h3>Name: @p.name</h3>
-	<p>Height: @p.height</p>
-	<p>ID: @p.id</p>
-	<p>Default?: @p.is_default</p>
-}
-
 @if (d != null)
 {
-	<h3>Name: @d.name</h3>
-	<p>Index: @d.index</p>
-	<p>Description: @d.desc</p>
+    <h3>Name: @d.name</h3>
+    <p>Index: @d.index</p>
+    <p>Description: @d.desc</p>
 
-	if(d2 == null)
-	{
-		<img src="@($"https://www.dnd5eapi.co/api/images/monsters/{inputText}.png")" alt="Picture">
-	}
-	else
-	{
-		<p>Image: No Image Found</p>
-	}
-
+    if (d2 == null)
+    {
+        <div style="background-image: url('@($"https://www.dnd5eapi.co/api/images/monsters/{inputText}.png")'); background-size: cover;">
+            <img src="@($"https://www.dnd5eapi.co/api/images/monsters/{inputText}.png")" alt="Monster Image" />
+        </div>
+    }
+    else
+    {
+        <div style="background-image: url('@($"DND_Background.jpg")'); background-size: cover;">
+            <img src="@("DND_Background.jpg")" alt="Default Image" />
+        </div>
+    }
 }
 
 
-
-<div class="dropdown">
-	<button @onclick="ToggleDropdown">Dropdown</button>
-	<div class="dropdown-content @(isDropdownVisible ? "show" : "")">
-		<a href="#">acolyte</a>
-		<a href="#">Item</a>
-		<a href="#">Item 3</a>
-	</div>
-</div>
-
-<!--
-	<div class="dropdown">
-	<button @onclick="ToggleDropdown">Dropdown</button>
-	<div class="dropdown-content @(isDropdownVisible ? "show" : "")">
-		<a href="#">acolyte</a>
-		<a href="#">Item</a>
-		<a href="#">Item 3</a>
-	</div>
-</div>
-
--->
 @code{
-	public List<DnD> Monsters = new List<DnD>();
-
-
 	public poke p;
 
 	public DnD d;
@@ -135,5 +95,4 @@ Welcome to your new app.
 		{
 			isDropdownVisible = !isDropdownVisible;
 		}
-	
 }
