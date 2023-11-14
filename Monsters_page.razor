@@ -11,16 +11,16 @@
 	<p>Index: @d.index</p>
 	<p>Description: @d.desc</p>
 
-	if(d2 == null)
+	@if (d2 == null)
 	{
-		<div style="background-image: url('@($"https://www.dnd5eapi.co/api/images/monsters/{inputText}.png")'); background-size: cover;></div>
+		<div style="background-image: url('@($"https://www.dnd5eapi.co/api/images/monsters/{inputText}.png")'); background-size: cover; width: 300px; height: 300px;"></div>
 	}
 	else
 	{
-		<div style="background-image: url('@($"DND_Background.jpg")'); background-size: cover;></div>
+		<div style="background-image: url('@($"DND_Background.jpg")'); background-size: cover; width: 300px; height: 300px;"></div>
 	}
-
 }
+
 
 
 @code{
