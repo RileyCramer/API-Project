@@ -1,28 +1,9 @@
-﻿@page "/"
+@page "/"
 
-<PageTitle>Index</PageTitle>
-
-
-
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<PageTitle>Monster</PageTitle>
 
 <h3>Input Data</h3>
 <input type="text" @bind="inputText" placeholder="Enter text" @onkeydown="@(e => { FetchDnD(); FetchDnDImage(); })" />
-
-
-
-
-<SurveyPrompt Title="How is Blazor working for you?" />
-
-@if(p != null)
-{
-	<h3>Name: @p.name</h3>
-	<p>Height: @p.height</p>
-	<p>ID: @p.id</p>
-	<p>Default?: @p.is_default</p>
-}
 
 @if (d != null)
 {
@@ -40,19 +21,6 @@ Welcome to your new app.
 	}
 
 }
-
-
-
-<div class="dropdown">
-	<button @onclick="ToggleDropdown">Dropdown</button>
-	<div class="dropdown-content @(isDropdownVisible ? "show" : "")">
-		<a href="#">acolyte</a>
-		<a href="#">Item</a>
-		<a href="#">Item 3</a>
-	</div>
-</div>
-
-
 
 
 @code{
@@ -124,7 +92,4 @@ Welcome to your new app.
 		{
 			isDropdownVisible = !isDropdownVisible;
 		}
-	
-
-
 }

@@ -3,6 +3,21 @@
 
 
 <div>
+
+    <h3>Name</h3>
+    <input type="text" @bind="dndName" placeholder="Enter text" @onkeydown="@(e => {SelectCharacter();})" />
+    <h3>Class</h3>
+    <input type="text" @bind="dndClass" placeholder="Enter text" @onkeydown="@(e => {})" />
+    <h3>Skills</h3>
+    <input type="text" @bind="dndSkills" placeholder="Enter text" @onkeydown="@(e => {})" />
+    <h3>SubClasses</h3>
+    <input type="text" @bind="dndSubClasses" placeholder="Enter text" @onkeydown="@(e => {})" />
+    <h3>Races</h3>
+    <input type="text" @bind="dndRaces" placeholder="Enter text" @onkeydown="@(e => {})" />
+    <h3>SubRaces</h3>
+    <input type="text" @bind="dndSubRaces" placeholder="Enter text" @onkeydown="@(e => {})" />
+
+
     @foreach (var character in Characters)
     {
         <button @onclick="() => SelectCharacter(character)">
@@ -15,21 +30,33 @@
 {
     <p>You selected: @SelectedCharacter.Name</p>
     <p>Class: @SelectedCharacter.Class</p>
+    <p>Skills: @SelectedCharacter.Skills</p>
 }
 
 @code {
+
+    private string dndName = "";
+    private string dndClass = "";
+    private string dndSkills = "";
+    private string dndSubClasses = "";
+    private string dndRaces = "";
+    private string dndSubRaces = "";
+
     // Define a simple Character class
     public class Character
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = "No Name";
         public string Class { get; set; } = "No Class";
-
+        public string Skills { get; set; } = "No Skills";
+        public string SubClasses { get; set; } = "No Sub Class";
+        public string Races { get; set; } = "Human";
+        public string SubRaces { get; set; } = "No Sub Race";
     }
 
     // Define a list of characters
     private List<Character> Characters = new List<Character>
     {
-        new Character { Name = "Character 1", Class = "Barbarian" },
+        new Character { Name = "Character 1", Class = "Barbarian", Skills = ""},
         new Character { Name = "Character 2", Class = "Bard"},
         new Character { Name = "Character 3", Class = "Cleric" },
         new Character { Name = "Character 4", Class = "Druid" },
