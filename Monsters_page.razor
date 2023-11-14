@@ -1,0 +1,95 @@
+@page "/"
+
+<PageTitle>Monster</PageTitle>
+
+<h3>Input Data</h3>
+<input type="text" @bind="inputText" placeholder="Enter text" @onkeydown="@(e => { FetchDnD(); FetchDnDImage(); })" />
+
+@if (d != null)
+{
+	<h3>Name: @d.name</h3>
+	<p>Index: @d.index</p>
+	<p>Description: @d.desc</p>
+
+	if(d2 == null)
+	{
+		<div style="background-image: url('@($"https://www.dnd5eapi.co/api/images/monsters/{inputText}.png")'); background-size: cover;
+	}
+	else
+	{
+		<div style="background-image: url('@($"DND_Background.jpg")'); background-size: cover;
+	}
+
+}
+
+
+@code{
+	public poke p;
+
+	public DnD d;
+
+	public DnD2 d2;
+
+	public DNDAPI dndAPI;
+
+	public HttpClient httpClient = new HttpClient();
+
+	public async Task Fetch()
+	{
+		p = await httpClient.GetFromJsonAsync<poke>("https://pokeapi.co/api/v2/pokemon/bulbasaur");
+	}
+
+	public async Task FetchDnD()
+	{
+		d = await httpClient.GetFromJsonAsync<DnD>("https://www.dnd5eapi.co/api/monsters/" + inputText);
+	}
+
+	public async Task FetchDnDImage()
+	{
+		d2 = await httpClient.GetFromJsonAsync<DnD2>("https://www.dnd5eapi.co/api/images/monsters/" + inputText + ".png");
+	}
+	
+
+	public class DNDAPI
+	{
+		public DnD[] results { get; set; }
+	}
+
+	public class DnD
+	{
+		public string name { get; set; }
+		public string index { get; set; }
+		public string desc { get; set; }
+		public string image { get; set; }
+	}
+
+	public class DnD2
+	{
+		public string image { get; set; }
+	}
+
+	public class poke
+	{
+		public string name { get; set; }
+		public int height { get; set; }
+		public int id { get; set; }
+		public bool is_default { get; set; }
+	}
+
+		private string inputText = "No input";
+
+		private void SubmitData()
+		{
+			// Process the input data, e.g., display it or send it to the server.
+			// You can access the inputText variable here to work with the input data.
+			Console.WriteLine("Input Data: " + inputText);
+		}
+	
+	
+		private bool isDropdownVisible = false;
+
+		private void ToggleDropdown()
+		{
+			isDropdownVisible = !isDropdownVisible;
+		}
+}
