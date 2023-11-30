@@ -1,8 +1,8 @@
-using BlazorMicah.Data;
+using Blazor_Practive_1.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
-namespace BlazorMicah
+namespace Blazor_Practive_1
 {
 	public class Program
 	{

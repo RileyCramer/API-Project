@@ -1,0 +1,117 @@
+﻿@page "/randomitem"
+
+<h1>Random Item</h1>
+
+
+<button @onclick="FetchRandomItem">Get Random Item</button>
+
+<h4>Monster Generator</h4>
+<select @bind="Mon">
+    <option value="">Select a monster</option>
+    @foreach (var class1 in Monsters)
+    {
+        <option value="@class1.index">@class1.name</option>
+    }
+</select>
+
+@code {
+    private string RandomItemText { get; set; }
+    private List<string> ItemsList { get; set; }
+    private readonly Random random = new Random();
+    private List<MonsterModel> Monsters { get; set; } = new List<MonsterModel>();
+    private MonsterModel Mon;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchMonstersFromApi();
+    }
+    /*
+    private async Task FetchItemsList()
+    {
+        HttpClient httpClient = new HttpClient();
+        string apiUrl = "https://www.dnd5eapi.co/api/monsters/"; // Replace with your API endpoint
+
+        try
+        {
+            HttpResponseMessage response = await httpClient.GetAsync(apiUrl);
+            if (response.IsSuccessStatusCode)
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                ItemsList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(jsonResponse);
+            }
+            else
+            {
+                RandomItemText = "Failed to fetch items!";
+            }
+        }
+        catch (Exception ex)
+        {
+            RandomItemText = "Error: " + ex.Message;
+        }
+    }
+    */
+    private void FetchRandomItem()
+    {
+        if (ItemsList != null && ItemsList.Count > 0)
+        {
+            int randomIndex = random.Next(0, ItemsList.Count);
+            RandomItemText = ItemsList[randomIndex];
+        }
+        else
+        {
+            RandomItemText = "No items available.";
+        }
+    }
+
+    private async Task<List<MonsterModel>> FetchMonstersFromApi()
+    {
+        try
+        {
+            HttpClient httpClient = new HttpClient();
+            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/monsters/"); // Replace with your API endpoint
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var apiResponse = System.Text.Json.JsonSerializer.Deserialize<ApiResponseModel>(content);
+
+                return apiResponse?.results.Select(result => new MonsterModel
+                    {
+                        index = result.index,
+                        name = result.name
+                    }).ToList() ?? new List<MonsterModel>();
+            }
+            else
+            {
+                // Handle unsuccessful response
+                return new List<MonsterModel>();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            return new List<MonsterModel>();
+        }
+    }
+
+    public class ApiResponseModel
+    {
+        public int Count { get; set; }
+        public List<MonsterResultModel> results { get; set; }
+    }
+
+    public class MonsterResultModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+    }
+
+    public class MonsterModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+    }
+
+}
+
