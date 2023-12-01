@@ -1,0 +1,139 @@
+﻿@page "/rules"
+<PageTitle>Rules and Regulations</PageTitle>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Futuristic Web Page</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="/data">Character Selector</a></li>
+                <li><a href="/MonsterInfo">Monsters</a></li>
+                <li><a href="/rules">Rules</a></li>
+                <li><a href="/Contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <p style="text-align:center;">Dungeons & Dragons (D&D) is governed by a set of rules that provide structure and guidance for gameplay. These rules cover various aspects, including character creation, combat mechanics, spellcasting, exploration, and interaction within the game world. Players create characters by selecting races, classes, abilities, and backgrounds, each contributing to a unique persona. During gameplay, the rules facilitate dice rolls to determine outcomes, such as attack success, skill checks, and damage dealt. The game mechanics, guided by these rules, enable players and dungeon masters to navigate the imaginary realms, weaving intricate narratives and shaping epic adventures within the collaborative storytelling experience of D&D.</p>
+
+    <h4>Rules</h4>
+    <select @bind="SelectedRule">
+        <option value="">Select a Rule</option>
+        @foreach (var ruleCategory in RulesList)
+        {
+            <option value="@ruleCategory.index">@ruleCategory.name</option>
+        }
+    </select>
+
+    
+    <button type="submit" @onclick="@(e => FetchRules(SelectedRule))">Submit</button>
+
+
+        @if (SelectedRule != null)
+        {
+            <h2>Index: @SelectedRule</h2>
+            
+        }
+        
+        @if (ruleInfo != null)
+        {
+            <p>@ruleInfo.desc</p>
+        }
+    
+    
+
+</body>
+</html>
+
+@code{
+    public RuleInfoModel ruleInfo;
+    private string SelectedRule { get; set; }
+    private RuleModel SelectedRuleDetails { get; set; }
+    private List<RuleModel> RulesList { get; set; } = new List<RuleModel>();
+    public HttpClient httpClient = new HttpClient();
+
+    public string input;
+    protected override async Task OnInitializedAsync()
+    {
+        RulesList = await FetchRulesFromApi();
+        
+    }
+
+    async Task FetchRules(string input)
+    {
+        ruleInfo = await httpClient.GetFromJsonAsync<RuleInfoModel>("https://www.dnd5eapi.co/api/rule-sections/" + input);
+    }
+
+
+    private async Task<List<RuleModel>> FetchRulesFromApi()
+    {
+        try
+        {
+            HttpClient httpClient = new HttpClient();
+            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/rule-sections/"); // Replace with your API endpoint
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var apiResponse = System.Text.Json.JsonSerializer.Deserialize<ApiResponseModel>(content);
+
+                return apiResponse?.results.Select(result => new RuleModel
+                    {
+                        index = result.index,
+                        name = result.name
+                    }).ToList() ?? new List<RuleModel>();
+            }
+            else
+            {
+                // Handle unsuccessful response
+                return new List<RuleModel>();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            return new List<RuleModel>();
+        }
+    }
+
+    public async Task FetchRules()
+    {
+        ruleInfo = await httpClient.GetFromJsonAsync<RuleInfoModel>("https://www.dnd5eapi.co/api/rule-sections/" + SelectedRule);
+    }
+
+    public class ApiResponseModel
+    {
+        public int Count { get; set; }
+        public List<RuleResultModel> results { get; set; }
+    }
+
+    public class RuleResultModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+    }
+
+    public class RuleModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+
+    }
+    public class RuleInfoModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+        public string desc { get; set; }
+    }
+
+    
+}

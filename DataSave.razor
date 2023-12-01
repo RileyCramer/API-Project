@@ -1,117 +1,350 @@
 ﻿@page "/randomitem"
 
 <h1>Random Item</h1>
+<head>
+    <meta charset="UTF-8">
+    <title>Futuristic Web Page</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<header>
+    <nav>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="/data">Character Selector</a></li>
+            <li><a href="/MonsterInfo">Monsters</a></li>
+            <li><a href="/rules">Rules</a></li>
+            <li><a href="/randomitem">Presets</a></li>
+        </ul>
+    </nav>
+</header>
 
 
-<button @onclick="FetchRandomItem">Get Random Item</button>
+<button @onclick="multiplemethods">Create Character</button>
 
-<h4>Monster Generator</h4>
-<select @bind="Mon">
-    <option value="">Select a monster</option>
-    @foreach (var class1 in Monsters)
-    {
-        <option value="@class1.index">@class1.name</option>
-    }
-</select>
+
+
+<div class="presets">
+    <h3>Dabah</h3>
+    <div class="presetsimg">
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </div>
+
+    <p>@RandomItemText</p>
+    <p>@RandomItemText2</p>
+    <p>@RandomItemText3</p>
+    <p>@RandomItemText4</p>
+</div>
+
+<div class="presets2">
+    <h3>Dabah</h3>
+    <div class="presets2img">
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </div>
+
+    <p>@RandomItemText</p>
+    <p>@RandomItemText2</p>
+    <p>@RandomItemText3</p>
+    <p>@RandomItemText4</p>
+</div>
+
+
 
 @code {
     private string RandomItemText { get; set; }
+    private string RandomItemText2 { get; set; }
+    private string RandomItemText3 { get; set; }
+    private string RandomItemText4 { get; set; }
     private List<string> ItemsList { get; set; }
     private readonly Random random = new Random();
-    private List<MonsterModel> Monsters { get; set; } = new List<MonsterModel>();
-    private MonsterModel Mon;
+    private List<RandMonsterModel> Monsters { get; set; } = new List<RandMonsterModel>();
+    private List<ClassesModel> Classes { get; set; } = new List<ClassesModel>();
+    private List<SpellModel> Spells { get; set; } = new List<SpellModel>();
+    private List<SkillsModel> Skills { get; set; } = new List<SkillsModel>();
+
+    private string Mon { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await FetchMonstersFromApi();
+        Monsters = await FetchMonstersFromApi();
+        Classes = await FetchClassesFromApi();
+        Spells = await FetchSpellsFromApi();
+        Skills = await FetchSkillsFromApi();
     }
-    /*
-    private async Task FetchItemsList()
-    {
-        HttpClient httpClient = new HttpClient();
-        string apiUrl = "https://www.dnd5eapi.co/api/monsters/"; // Replace with your API endpoint
 
-        try
-        {
-            HttpResponseMessage response = await httpClient.GetAsync(apiUrl);
-            if (response.IsSuccessStatusCode)
-            {
-                string jsonResponse = await response.Content.ReadAsStringAsync();
-                ItemsList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(jsonResponse);
-            }
-            else
-            {
-                RandomItemText = "Failed to fetch items!";
-            }
-        }
-        catch (Exception ex)
-        {
-            RandomItemText = "Error: " + ex.Message;
-        }
+    private void multiplemethods()
+    {
+        FetchRandomItem();
+        FetchRandomClassesItem();
+        FetchRandomSkillsItem();
+        FetchRandomSpellsItem();
+
     }
-    */
+
     private void FetchRandomItem()
     {
-        if (ItemsList != null && ItemsList.Count > 0)
+        if (Monsters != null && Monsters.Count > 0)
         {
-            int randomIndex = random.Next(0, ItemsList.Count);
-            RandomItemText = ItemsList[randomIndex];
+            int randomIndex = random.Next(0, Monsters.Count);
+            RandomItemText = "Randomly selected Race: " + Monsters.ElementAt(randomIndex).name;
         }
         else
         {
-            RandomItemText = "No items available.";
+            RandomItemText = "No monsters available.";
         }
     }
 
-    private async Task<List<MonsterModel>> FetchMonstersFromApi()
+    private async Task<List<RandMonsterModel>> FetchMonstersFromApi()
     {
         try
         {
             HttpClient httpClient = new HttpClient();
-            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/monsters/"); // Replace with your API endpoint
+            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/races/"); // Replace with your API endpoint
 
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var apiResponse = System.Text.Json.JsonSerializer.Deserialize<ApiResponseModel>(content);
+                var apiResponse = System.Text.Json.JsonSerializer.Deserialize<RandApiResponseModel>(content);
 
-                return apiResponse?.results.Select(result => new MonsterModel
+                return apiResponse?.results.Select(result => new RandMonsterModel
                     {
                         index = result.index,
                         name = result.name
-                    }).ToList() ?? new List<MonsterModel>();
+                    }).ToList() ?? new List<RandMonsterModel>();
             }
             else
             {
                 // Handle unsuccessful response
-                return new List<MonsterModel>();
+                return new List<RandMonsterModel>();
             }
         }
         catch (Exception ex)
         {
             // Handle exceptions
-            return new List<MonsterModel>();
+            return new List<RandMonsterModel>();
         }
     }
 
-    public class ApiResponseModel
+    public class RandApiResponseModel
     {
         public int Count { get; set; }
-        public List<MonsterResultModel> results { get; set; }
+        public List<RandMonsterResultModel> results { get; set; }
     }
 
-    public class MonsterResultModel
+    public class RandMonsterResultModel
     {
         public string index { get; set; }
         public string name { get; set; }
         public string url { get; set; }
     }
 
-    public class MonsterModel
+    public class RandMonsterModel
     {
         public string index { get; set; }
         public string name { get; set; }
     }
 
+    private void FetchRandomClassesItem()
+    {
+        if (Classes != null && Classes.Count > 0)
+        {
+            int randomIndex = random.Next(0, Classes.Count);
+            RandomItemText2 = "Randomly selected Class: " + Classes.ElementAt(randomIndex).name;
+        }
+        else
+        {
+            RandomItemText2 = "No class available.";
+        }
+    }
+
+    private async Task<List<ClassesModel>> FetchClassesFromApi()
+    {
+        try
+        {
+            HttpClient httpClient = new HttpClient();
+            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/classes/"); // Replace with your API endpoint
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var apiResponse = System.Text.Json.JsonSerializer.Deserialize<ClassesApiResponseModel>(content);
+
+                return apiResponse?.results.Select(result => new ClassesModel
+                    {
+                        index = result.index,
+                        name = result.name
+                    }).ToList() ?? new List<ClassesModel>();
+            }
+            else
+            {
+                // Handle unsuccessful response
+                return new List<ClassesModel>();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            return new List<ClassesModel>();
+        }
+    }
+
+    public class ClassesApiResponseModel
+    {
+        public int Count { get; set; }
+        public List<RandMonsterResultModel> results { get; set; }
+    }
+
+    public class ClassesResultModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+    }
+
+    public class ClassesModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+    }
+
+    private void FetchRandomSpellsItem()
+    {
+        if (Spells != null && Spells.Count > 0)
+        {
+            int randomIndex = random.Next(0, Spells.Count);
+            RandomItemText3 = "Randomly selected Spell: " + Spells.ElementAt(randomIndex).name;
+        }
+        else
+        {
+            RandomItemText3 = "No Spell available.";
+        }
+    }
+
+    private async Task<List<SpellModel>> FetchSpellsFromApi()
+    {
+        try
+        {
+            HttpClient httpClient = new HttpClient();
+            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/spells/"); // Replace with your API endpoint
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var apiResponse = System.Text.Json.JsonSerializer.Deserialize<SpellApiResponseModel>(content);
+
+                return apiResponse?.results.Select(result => new SpellModel
+                    {
+                        index = result.index,
+                        name = result.name
+                    }).ToList() ?? new List<SpellModel>();
+            }
+            else
+            {
+                // Handle unsuccessful response
+                return new List<SpellModel>();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            return new List<SpellModel>();
+        }
+    }
+    public class SpellApiResponseModel
+    {
+        public int Count { get; set; }
+        public List<SpellMonsterResultModel> results { get; set; }
+    }
+
+    public class SpellMonsterResultModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+    }
+
+    public class SpellModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+    }
+
+
+    private void FetchRandomSkillsItem()
+    {
+        if (Skills != null && Skills.Count > 0)
+        {
+            int randomIndex = random.Next(0, Skills.Count);
+            RandomItemText4 = "Randomly selected Skill: " + Skills.ElementAt(randomIndex).name;
+        }
+        else
+        {
+            RandomItemText4 = "No skill available.";
+        }
+    }
+
+    private async Task<List<SkillsModel>> FetchSkillsFromApi()
+    {
+        try
+        {
+            HttpClient httpClient = new HttpClient();
+            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/skills/"); // Replace with your API endpoint
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var apiResponse = System.Text.Json.JsonSerializer.Deserialize<SkillsApiResponseModel>(content);
+
+                return apiResponse?.results.Select(result => new SkillsModel
+                    {
+                        index = result.index,
+                        name = result.name
+                    }).ToList() ?? new List<SkillsModel>();
+            }
+            else
+            {
+                // Handle unsuccessful response
+                return new List<SkillsModel>();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            return new List<SkillsModel>();
+        }
+    }
+
+    public class SkillsApiResponseModel
+    {
+        public int Count { get; set; }
+        public List<SkillsResultModel> results { get; set; }
+    }
+
+    public class SkillsResultModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+    }
+
+    public class SkillsModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+    }
 }
 

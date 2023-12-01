@@ -1,0 +1,167 @@
+﻿@page "/MonsterInfo"
+<h3>Monsters</h3>
+
+<head>
+    <meta charset="UTF-8">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="/data">Character Selector</a></li>
+                <li><a href="/MonsterInfo">Monsters</a></li>
+                <li><a href="/rules">Rules</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    
+    <!-- HiddenTabComponent.razor -->
+
+
+
+        
+
+<div style="text-align:center;">
+    <h4>Monster Info</h4>
+
+    <p>
+        In the Dungeons & Dragons (D&D) universe, monsters are a quintessential aspect, showcasing an incredibly diverse and imaginative array of creatures that inhabit its multiverse. From the iconic dragons with their majestic power and cunning intelligence to the hordes of goblins, orcs, and trolls, each monster possesses its unique traits, abilities, and lore. Beholders, with their floating spherical bodies and deadly eye stalks, epitomize eerie and enigmatic adversaries. Creatures like the gelatinous cube or the mimics, capable of assuming the forms of mundane objects, add an element of surprise and danger in the most unexpected places. The richness of D&D's monsters extends beyond combat, often intertwining with the game's storytelling, allowing players and dungeon masters to delve into a world teeming with fascinating, sometimes terrifying, and always thrilling creatures that challenge adventurers in myriad ways, making each encounter an unforgettable part of the journey.
+    </p>
+
+
+
+    <select @bind="SelectedMonster">
+        <option value="">Select a Monster</option>
+        @foreach (var ruleCategory in Monsters)
+        {
+            <option value="@ruleCategory.index">@ruleCategory.name</option>
+        }
+    </select>
+
+
+    <button type="submit" @onclick="@(e => Fetchinfo(SelectedMonster))">Click here</button>
+
+    <div>
+       
+        @if (mon != null)
+        {
+            <h1>Name: @mon.name</h1>
+            <h2>Index: @mon.index</h2>
+            <p>@mon.desc</p>
+            <img src="@($"https://www.dnd5eapi.co/api/images/monsters/{SelectedMonster}.png")" alt="Picture">
+        }
+
+
+    </div>
+</div>
+    
+
+
+    
+
+
+
+@code {
+
+    private bool isTabVisible = false;
+
+    private string displayStyle => isTabVisible ? "display: block;" : "display: none;";
+
+    private void ToggleHiddenTab()
+    {
+        isTabVisible = !isTabVisible;
+    }
+
+}
+
+
+
+@code {
+        public string SelectedMonster;
+
+        private List<MonsterModel> Monsters { get; set; } = new List<MonsterModel>();
+
+        public MonsterModel mon;
+
+        public MonsterModel d2;
+
+        public HttpClient httpClient = new HttpClient();
+
+        protected override async Task OnInitializedAsync()
+        {
+            Monsters = await FetchMonsterFromApi();
+
+        }
+
+        async Task Fetchinfo(string input)
+        {
+            mon = await httpClient.GetFromJsonAsync<MonsterModel>("https://www.dnd5eapi.co/api/monsters/" + input);
+        }
+
+        private async Task<List<MonsterModel>> FetchMonsterFromApi()
+        {
+            try
+            {
+                HttpClient httpClient = new HttpClient();
+                var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/monsters/"); // Replace with your API endpoint
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var apiResponse = System.Text.Json.JsonSerializer.Deserialize<ApiResponseModel>(content);
+
+                    return apiResponse?.results.Select(result => new MonsterModel
+                    {
+                        index = result.index,
+                        name = result.name
+                    }).ToList() ?? new List<MonsterModel>();
+                }
+                else
+                {
+                    // Handle unsuccessful response
+                    return new List<MonsterModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions
+                return new List<MonsterModel>();
+            }
+        }
+
+        public async Task Fetchinfo()
+        {
+            mon = await httpClient.GetFromJsonAsync<MonsterModel>("https://www.dnd5eapi.co/api/rule-sections/" + SelectedMonster);
+        }
+
+        public async Task FetchDnDImage()
+        {
+            d2 = await httpClient.GetFromJsonAsync<MonsterModel>("https://www.dnd5eapi.co/api/images/monsters/" + SelectedMonster + ".png");
+        }
+
+        public class ApiResponseModel
+        {
+            public int Count { get; set; }
+            public List<MonsterResultModel> results { get; set; }
+        }
+
+        public class MonsterResultModel
+        {
+            public string index { get; set; }
+            public string name { get; set; }
+            public string url { get; set; }
+        }
+
+        public class MonsterModel
+        {
+            public string index { get; set; }
+            public string name { get; set; }
+            public string desc { get; set; } = "No Description";
+            public string image { get; set; } = "No Image";
+        }
+}

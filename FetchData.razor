@@ -1,47 +1,239 @@
-﻿@page "/fetchdata"
-@using BlazorMicah.Data
-@inject WeatherForecastService ForecastService
+﻿@page "/data"
+@using Blazor_Practive_1.Data
+<!-- MyDropdown.razor -->
 
-<PageTitle>Weather forecast</PageTitle>
+<head>
+    <meta charset="UTF-8">
+    <title>Futuristic Web Page</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
 
-<h1>Weather forecast</h1>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="/data">Character Selector</a></li>
+                <li><a href="/MonsterInfo">Monsters</a></li>
+                <li><a href="/rules">Rules</a></li>
+                <li><a href="/Contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
 
-<p>This component demonstrates fetching data from a service.</p>
 
-@if (forecasts == null)
+<p style="text-align:center;">
+    Enter the fantastical world of Dungeons & Dragons and embark on a thrilling adventure with an eclectic ensemble of characters awaiting your selection. Each hero is a tapestry woven from the threads of myth and legend, brimming with unique abilities, backgrounds, and destinies. Choose from valiant knights adorned in gleaming armor, wielding swords that shimmer with magic; arcane spellcasters, wielding the very forces of nature and the elements at their command; stealthy rogues, adept at navigating shadows and unlocking secrets; wise and enigmatic wizards, mastering the arcane arts; mighty barbarians, fueled by raw strength and primal fury; clerics, channeling divine powers to heal wounds and banish darkness; and many more archetypes, each poised to carve their mark in the annals of this epic saga. Your journey begins here – choose your character wisely, for the fate of the realm hangs upon the shoulders of your chosen champion.
+
+
+
+
+
+</p>
+
+<h4>Monster Generator</h4>
+<select @bind="SelectedOption">
+    <option value="">Select a monster</option>
+    @foreach (var class1 in Classes)
+    {
+        <option value="@class1.index">@class1.name</option>
+    }
+</select>
+
+<h4>Skill Generator</h4>
+<select @bind="SelectedSkill">
+    <option value="">Select a Skill</option>
+    @foreach (var skill in Skills)
+    {
+        <option value="@skill.index">@skill.name</option>
+    }
+</select>
+
+<h4>Races Generator</h4>
+<select @bind="SelectedRace">
+    <option value="">Select a Race</option>
+    @foreach (var race in Races)
+    {
+        <option value="@race.index">@race.name</option>
+    }
+</select>
+
+@if (SelectedOption != null)
 {
-    <p><em>Loading...</em></p>
+    <h3>Details of Selected Class</h3>
+    <p>Primary Class: @SelectedOption</p>
+    <p>Primary Skill: @SelectedSkill</p>
+    <p>Race: @SelectedRace</p>
+    <!-- Display additional details of the selected class as needed -->
 }
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+
+
+
+
+
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private string SelectedSkill { get; set; }
+    private string SelectedOption { get; set; }
+    private string SelectedRace { get; set; }
+    private List<MonsterModel> Classes { get; set; } = new List<MonsterModel>();
+    private List<SkillsModel> Skills { get; set; } = new List<SkillsModel>();
+    private List<RaceModel> Races { get; set; } = new List<RaceModel>();
+
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateOnly.FromDateTime(DateTime.Now));
+        Classes = await FetchMonstersFromApi();
+        Skills = await FetchSkillsFromApi();
+        Races = await FetchRaceFromApi();
     }
+
+    private async Task<List<MonsterModel>> FetchMonstersFromApi()
+    {
+        try
+        {
+            HttpClient httpClient = new HttpClient();
+            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/classes/"); // Replace with your API endpoint
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var apiResponse = System.Text.Json.JsonSerializer.Deserialize<ApiResponseModel>(content);
+
+                return apiResponse?.results.Select(result => new MonsterModel
+                    {
+                        index = result.index,
+                        name = result.name
+                    }).ToList() ?? new List<MonsterModel>();
+            }
+            else
+            {
+                // Handle unsuccessful response
+                return new List<MonsterModel>();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            return new List<MonsterModel>();
+        }
+    }
+
+    public class ApiResponseModel
+    {
+        public int Count { get; set; }
+        public List<MonsterResultModel> results { get; set; }
+    }
+
+    public class MonsterResultModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+    }
+
+    public class MonsterModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+    }
+
+    public class ApiSkillModel
+    {
+        public int Count { get; set; }
+        public List<MonsterResultModel> results { get; set; }
+    }
+
+    public class SkillResultModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+    }
+
+    public class SkillsModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+    }
+    private async Task<List<SkillsModel>> FetchSkillsFromApi()
+    {
+        try
+        {
+            HttpClient httpClient = new HttpClient();
+            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/skills/"); // Replace with your API endpoint
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var apiResponse = System.Text.Json.JsonSerializer.Deserialize<ApiResponseModel>(content);
+
+                return apiResponse?.results.Select(result => new SkillsModel
+                    {
+                        index = result.index,
+                        name = result.name
+                    }).ToList() ?? new List<SkillsModel>();
+            }
+            else
+            {
+                // Handle unsuccessful response
+                return new List<SkillsModel>();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            return new List<SkillsModel>();
+        }
+    }
+
+
+    public class ApiRaceModel
+    {
+        public int Count { get; set; }
+        public List<MonsterResultModel> results { get; set; }
+    }
+
+    public class RaceResultModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+    }
+
+    public class RaceModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+    }
+    private async Task<List<RaceModel>> FetchRaceFromApi()
+    {
+        try
+        {
+            HttpClient httpClient = new HttpClient();
+            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/races/"); // Replace with your API endpoint
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var apiResponse = System.Text.Json.JsonSerializer.Deserialize<ApiResponseModel>(content);
+
+                return apiResponse?.results.Select(result => new RaceModel
+                    {
+                        index = result.index,
+                        name = result.name
+                    }).ToList() ?? new List<RaceModel>();
+            }
+            else
+            {
+                // Handle unsuccessful response
+                return new List<RaceModel>();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            return new List<RaceModel>();
+        }
+    }
+
 }

@@ -12,10 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\css\images\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="wwwroot\css\images\dndback.jpg" />
   </ItemGroup>
 

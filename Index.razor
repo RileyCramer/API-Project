@@ -2,138 +2,335 @@
 
 <PageTitle>Index</PageTitle>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Futuristic Web Page</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="home">
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="/data">Character Selector</a></li>
+                <li><a href="/MonsterInfo">Monsters</a></li>
+                <li><a href="/rules">Rules</a></li>
+                <li><a href="/randomitem">Presets</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Dragons And Dungeons</h1>
+            <p>Explore this world full of dragons and of course dungeons.</p>
+            <a href="#" class="cta-button">Get Started</a>
+        </section>
+
+        <section class="features">
+            <div class="feature">
+                <h2>All About Monsters</h2>
+                <p>Expand Your Knowledge.</p>
+            </div>
+            <div class="feature">
+                <h2>Rules & Regulations</h2>
+                <p>Strategize a Plan.</p>
+            </div>
+            <div class="feature">
+                <h2>Character Creation</h2>
+                <p>Show Some Creativity.</p>
+            </div>
+        </section>
+        <hr />
+        <section class="features">
+        <div class="feature">
+            <h2>Whats the Monster of the day?</h2>
+            <button @onclick="FetchRandomItem">Create Character</button>
+            <p>@RandomItemText</p>
+        </div>
+        <div class="feature">
+            <h2>Dice Roller</h2>
+
+            <div>
+                <label>Select a type of dice:</label>
+                <select @bind="selectedDice">
+                    <option value="4">d4</option>
+                    <option value="6">d6</option>
+                    <option value="8">d8</option>
+                    <option value="10">d10</option>
+                    <option value="12">d12</option>
+                    <option value="20">d20</option>
+                </select>
+            </div>
+
+            <div>
+                <button @onclick="RollDice">Roll the @selectedDice</button>
+            </div>
+
+            @if (diceResult != null)
+            {
+                <div>
+                    <p>You rolled @diceResult</p>
+                </div>
+            }
+        </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Micah&Riley Web Page</p>
+    </footer>
+    </div>
+</body>
+</html>
 
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+@code {
+    private int selectedDice = 6; // Default to d6
+    private int? diceResult;
 
-<h3>Input Data</h3>
-<input type="text" @bind="inputText" placeholder="Enter text" @onkeydown="@(e => { FetchDnD(); FetchDnDImage(); })" />
-
-
-
-
-<SurveyPrompt Title="How is Blazor working for you?" />
-
-@if(p != null)
-{
-	<h3>Name: @p.name</h3>
-	<p>Height: @p.height</p>
-	<p>ID: @p.id</p>
-	<p>Default?: @p.is_default</p>
+    private void RollDice()
+    {
+        Random random = new Random();
+        diceResult = random.Next(1, selectedDice + 1); // Generate a random number from 1 to selectedDice
+    }
 }
 
-@if (d != null)
-{
-	<h3>Name: @d.name</h3>
-	<p>Index: @d.index</p>
-	<p>Description: @d.desc</p>
-
-	if(d2 == null)
-	{
-		<img src="@($"https://www.dnd5eapi.co/api/images/monsters/{inputText}.png")" alt="Picture">
-	}
-	else
-	{
-		<p>Image: No Image Found</p>
-	}
-
-}
 
 
+@code {
 
-<div class="dropdown">
-	<button @onclick="ToggleDropdown">Dropdown</button>
-	<div class="dropdown-content @(isDropdownVisible ? "show" : "")">
-		<a href="#">acolyte</a>
-		<a href="#">Item</a>
-		<a href="#">Item 3</a>
-	</div>
-</div>
+    private List<RandMonsterModel> Monsters { get; set; } = new List<RandMonsterModel>();
+    private readonly Random random = new Random();
+    private string RandomItemText { get; set; }
 
-<!--
-	<div class="dropdown">
-	<button @onclick="ToggleDropdown">Dropdown</button>
-	<div class="dropdown-content @(isDropdownVisible ? "show" : "")">
-		<a href="#">acolyte</a>
-		<a href="#">Item</a>
-		<a href="#">Item 3</a>
-	</div>
-</div>
+    protected override async Task OnInitializedAsync()
+    {
+        Monsters = await FetchMonstersFromApi();
+    }
 
--->
-@code{
-	public List<DnD> Monsters = new List<DnD>();
+    private void FetchRandomItem()
+    {
+        if (Monsters != null && Monsters.Count > 0)
+        {
+            int randomIndex = random.Next(0, Monsters.Count);
+            RandomItemText = "Monster of the Day: " + Monsters.ElementAt(randomIndex).name;
+        }
+        else
+        {
+            RandomItemText = "No monsters available.";
+        }
+    }
+
+    private async Task<List<RandMonsterModel>> FetchMonstersFromApi()
+    {
+        try
+        {
+            HttpClient httpClient = new HttpClient();
+            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/monsters/"); // Replace with your API endpoint
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var apiResponse = System.Text.Json.JsonSerializer.Deserialize<RandApiResponseModel>(content);
+
+                return apiResponse?.results.Select(result => new RandMonsterModel
+                    {
+                        index = result.index,
+                        name = result.name
+                    }).ToList() ?? new List<RandMonsterModel>();
+            }
+            else
+            {
+                // Handle unsuccessful response
+                return new List<RandMonsterModel>();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            return new List<RandMonsterModel>();
+        }
+    }
+
+    public class RandApiResponseModel
+    {
+        public int Count { get; set; }
+        public List<RandMonsterResultModel> results { get; set; }
+    }
+
+    public class RandMonsterResultModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+    }
+
+    public class RandMonsterModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+    }
+
+    /*
+    private string SelectedSkill { get; set; }
+    private string SelectedOption { get; set; }
+    private List<MonsterModel> Monsters { get; set; } = new List<MonsterModel>();
+    private List<SkillsModel> Skills { get; set; } = new List<SkillsModel>();
 
 
-	public poke p;
+    protected override async Task OnInitializedAsync()
+    {
+        Monsters = await FetchMonstersFromApi();
+    }
 
-	public DnD d;
+    private async Task<List<MonsterModel>> FetchMonstersFromApi()
+    {
+        try
+        {
+            HttpClient httpClient = new HttpClient();
+            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/monsters/"); // Replace with your API endpoint
 
-	public DnD2 d2;
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var apiResponse = System.Text.Json.JsonSerializer.Deserialize<ApiResponseModel>(content);
 
-	public DNDAPI dndAPI;
+                return apiResponse?.results.Select(result => new MonsterModel
+                    {
+                        index = result.index,
+                        name = result.name
+                    }).ToList() ?? new List<MonsterModel>();
+            }
+            else
+            {
+                // Handle unsuccessful response
+                return new List<MonsterModel>();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            return new List<MonsterModel>();
+        }
+    }
 
-	public HttpClient httpClient = new HttpClient();
+    public class ApiResponseModel
+    {
+        public int Count { get; set; }
+        public List<MonsterResultModel> results { get; set; }
+    }
 
-	public async Task Fetch()
-	{
-		p = await httpClient.GetFromJsonAsync<poke>("https://pokeapi.co/api/v2/pokemon/bulbasaur");
-	}
+    public class MonsterResultModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+    }
 
-	public async Task FetchDnD()
-	{
-		d = await httpClient.GetFromJsonAsync<DnD>("https://www.dnd5eapi.co/api/monsters/" + inputText);
-	}
+    public class MonsterModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+    }
 
-	public async Task FetchDnDImage()
-	{
-		d2 = await httpClient.GetFromJsonAsync<DnD2>("https://www.dnd5eapi.co/api/images/monsters/" + inputText + ".png");
-	}
-	
 
-	public class DNDAPI
-	{
-		public DnD[] results { get; set; }
-	}
+    public class ApiSkillModel
+    {
+        public int Count { get; set; }
+        public List<MonsterResultModel> results { get; set; }
+    }
 
-	public class DnD
-	{
-		public string name { get; set; }
-		public string index { get; set; }
-		public string desc { get; set; }
-		public string image { get; set; }
-	}
+    public class SkillResultModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+        public string url { get; set; }
+    }
 
-	public class DnD2
-	{
-		public string image { get; set; }
-	}
+    public class SkillsModel
+    {
+        public string index { get; set; }
+        public string name { get; set; }
+    }
+    private async Task<List<SkillsModel>> FetchSkillsFromApi()
+    {
+        try
+        {
+            HttpClient httpClient = new HttpClient();
+            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/skills/"); // Replace with your API endpoint
 
-	public class poke
-	{
-		public string name { get; set; }
-		public int height { get; set; }
-		public int id { get; set; }
-		public bool is_default { get; set; }
-	}
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var apiResponse = System.Text.Json.JsonSerializer.Deserialize<ApiResponseModel>(content);
 
-		private string inputText = "No input";
+                return apiResponse?.results.Select(result => new SkillsModel
+                    {
+                        index = result.index,
+                        name = result.name
+                    }).ToList() ?? new List<SkillsModel>();
+            }
+            else
+            {
+                // Handle unsuccessful response
+                return new List<SkillsModel>();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            return new List<SkillsModel>();
+        }
+    }
+    */
 
-		private void SubmitData()
-		{
-			// Process the input data, e.g., display it or send it to the server.
-			// You can access the inputText variable here to work with the input data.
-			Console.WriteLine("Input Data: " + inputText);
-		}
-	
-	
-		private bool isDropdownVisible = false;
 
-		private void ToggleDropdown()
-		{
-			isDropdownVisible = !isDropdownVisible;
-		}
-	
+
+
+
+
+
+
+
+
+
+
+    // Define a simple Character class
+    public class Character
+    {
+        public string Name { get; set; }
+        public string Class { get; set; } = "No Class";
+
+    }
+
+    // Define a list of characters
+    private List<Character> Characters = new List<Character>
+    {
+        new Character { Name = "Character 1", Class = "Barbarian" },
+        new Character { Name = "Character 2", Class = "Bard"},
+        new Character { Name = "Character 3", Class = "Cleric" },
+        new Character { Name = "Character 4", Class = "Druid" },
+        new Character { Name = "Character 5", Class = "Fighter" },
+        new Character { Name = "Character 6", Class = "Monk" },
+        new Character { Name = "Character 7", Class = "Paladin" },
+        new Character { Name = "Character 8", Class = "Ranger" },
+        new Character { Name = "Character 9", Class = "Rogue" },
+        new Character { Name = "Character 10", Class = "Sorcerer" },
+        new Character { Name = "Character 11", Class = "Warlock" },
+        new Character { Name = "Character 12", Class = "Wizard" }
+    };
+
+    // Track the selected character
+    private Character SelectedCharacter { get; set; }
+
+    // Method to handle character selection
+    private void SelectCharacter(Character character)
+    {
+        SelectedCharacter = character;
+    }
 }
