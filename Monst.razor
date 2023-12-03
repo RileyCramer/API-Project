@@ -1,5 +1,5 @@
 ﻿@page "/MonsterInfo"
-<h3>Monsters</h3>
+
 
 <head>
     <meta charset="UTF-8">
@@ -11,29 +11,24 @@
         <nav>
             <ul>
                 <li><a href="#">Home</a></li>
-                <li><a href="/data">Character Selector</a></li>
+                <li><a href="/data">Character Creator</a></li>
                 <li><a href="/MonsterInfo">Monsters</a></li>
                 <li><a href="/rules">Rules</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a href="/randomitem">Presets</a></li>
             </ul>
         </nav>
     </header>
-
-    
-    <!-- HiddenTabComponent.razor -->
-
-
-
         
+    <br />
 
-<div style="text-align:center;">
+    <div class="textdnd">
     <h4>Monster Info</h4>
 
     <p>
         In the Dungeons & Dragons (D&D) universe, monsters are a quintessential aspect, showcasing an incredibly diverse and imaginative array of creatures that inhabit its multiverse. From the iconic dragons with their majestic power and cunning intelligence to the hordes of goblins, orcs, and trolls, each monster possesses its unique traits, abilities, and lore. Beholders, with their floating spherical bodies and deadly eye stalks, epitomize eerie and enigmatic adversaries. Creatures like the gelatinous cube or the mimics, capable of assuming the forms of mundane objects, add an element of surprise and danger in the most unexpected places. The richness of D&D's monsters extends beyond combat, often intertwining with the game's storytelling, allowing players and dungeon masters to delve into a world teeming with fascinating, sometimes terrifying, and always thrilling creatures that challenge adventurers in myriad ways, making each encounter an unforgettable part of the journey.
     </p>
-
-
+    </div>
+<div style="text-align:center;">
 
     <select @bind="SelectedMonster">
         <option value="">Select a Monster</option>
@@ -60,25 +55,6 @@
     </div>
 </div>
     
-
-
-    
-
-
-
-@code {
-
-    private bool isTabVisible = false;
-
-    private string displayStyle => isTabVisible ? "display: block;" : "display: none;";
-
-    private void ToggleHiddenTab()
-    {
-        isTabVisible = !isTabVisible;
-    }
-
-}
-
 
 
 @code {
@@ -108,7 +84,7 @@
             try
             {
                 HttpClient httpClient = new HttpClient();
-                var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/monsters/"); // Replace with your API endpoint
+                var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/monsters/"); 
 
                 if (response.IsSuccessStatusCode)
                 {

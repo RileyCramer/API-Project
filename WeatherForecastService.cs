@@ -1,4 +1,4 @@
-namespace BlazorMicah.Data
+namespace Blazor_Practive_1.Data
 {
 	public class WeatherForecastService
 	{

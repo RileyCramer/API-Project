@@ -13,15 +13,18 @@
         <nav>
             <ul>
                 <li><a href="#">Home</a></li>
-                <li><a href="/data">Character Selector</a></li>
-                <li><a href="/MonsterInfo">Monsters</a></li>
+                <li><a href="/data">Character Creator</a></li>
+                <li><a href="/monsterInfo">Monsters</a></li>
                 <li><a href="/rules">Rules</a></li>
-                <li><a href="/Contact">Contact</a></li>
+                <li><a href="/randomitem">Presets</a></li>
             </ul>
         </nav>
     </header>
-
+    <br />
+    <div class="textdnd">
+    <h2>Rules</h2>
     <p style="text-align:center;">Dungeons & Dragons (D&D) is governed by a set of rules that provide structure and guidance for gameplay. These rules cover various aspects, including character creation, combat mechanics, spellcasting, exploration, and interaction within the game world. Players create characters by selecting races, classes, abilities, and backgrounds, each contributing to a unique persona. During gameplay, the rules facilitate dice rolls to determine outcomes, such as attack success, skill checks, and damage dealt. The game mechanics, guided by these rules, enable players and dungeon masters to navigate the imaginary realms, weaving intricate narratives and shaping epic adventures within the collaborative storytelling experience of D&D.</p>
+    </div>
 
     <h4>Rules</h4>
     <select @bind="SelectedRule">
@@ -35,7 +38,8 @@
     
     <button type="submit" @onclick="@(e => FetchRules(SelectedRule))">Submit</button>
 
-
+    <div class="textdnd">
+        <h3>Description</h3>
         @if (SelectedRule != null)
         {
             <h2>Index: @SelectedRule</h2>
@@ -46,7 +50,7 @@
         {
             <p>@ruleInfo.desc</p>
         }
-    
+    </div>
     
 
 </body>
@@ -77,7 +81,7 @@
         try
         {
             HttpClient httpClient = new HttpClient();
-            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/rule-sections/"); // Replace with your API endpoint
+            var response = await httpClient.GetAsync("https://www.dnd5eapi.co/api/rule-sections/"); 
 
             if (response.IsSuccessStatusCode)
             {
@@ -92,13 +96,13 @@
             }
             else
             {
-                // Handle unsuccessful response
+               
                 return new List<RuleModel>();
             }
         }
         catch (Exception ex)
         {
-            // Handle exceptions
+           
             return new List<RuleModel>();
         }
     }

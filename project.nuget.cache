@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "2VixR8ct2MBpIA50pktsuNSmmEUoIkuJsH13NGxzSk4mGSm5P2GS5y1jrj0SIrHniYNLnErAir3LqCm3Amvo9Q==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\micah\\source\\repos\\Blazor Practive#1\\Blazor Practive#1\\Blazor Practive#1.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\micah\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -12,27 +12,23 @@
         <nav>
             <ul>
                 <li><a href="#">Home</a></li>
-                <li><a href="/data">Character Selector</a></li>
+                <li><a href="/data">Character Creator</a></li>
                 <li><a href="/MonsterInfo">Monsters</a></li>
                 <li><a href="/rules">Rules</a></li>
-                <li><a href="/Contact">Contact</a></li>
+                <li><a href="/randomitem">Presets</a></li>
             </ul>
         </nav>
     </header>
-
-
-<p style="text-align:center;">
-    Enter the fantastical world of Dungeons & Dragons and embark on a thrilling adventure with an eclectic ensemble of characters awaiting your selection. Each hero is a tapestry woven from the threads of myth and legend, brimming with unique abilities, backgrounds, and destinies. Choose from valiant knights adorned in gleaming armor, wielding swords that shimmer with magic; arcane spellcasters, wielding the very forces of nature and the elements at their command; stealthy rogues, adept at navigating shadows and unlocking secrets; wise and enigmatic wizards, mastering the arcane arts; mighty barbarians, fueled by raw strength and primal fury; clerics, channeling divine powers to heal wounds and banish darkness; and many more archetypes, each poised to carve their mark in the annals of this epic saga. Your journey begins here – choose your character wisely, for the fate of the realm hangs upon the shoulders of your chosen champion.
-
-
-
-
-
-</p>
-
-<h4>Monster Generator</h4>
+<br />
+<div class= "textdnd">
+    <h2>Character Creator</h2>
+    <p>
+        Enter the fantastical world of Dungeons & Dragons and embark on a thrilling adventure with an eclectic ensemble of characters awaiting your selection. Each hero is a tapestry woven from the threads of myth and legend, brimming with unique abilities, backgrounds, and destinies. Choose from valiant knights adorned in gleaming armor, wielding swords that shimmer with magic; arcane spellcasters, wielding the very forces of nature and the elements at their command; stealthy rogues, adept at navigating shadows and unlocking secrets; wise and enigmatic wizards, mastering the arcane arts; mighty barbarians, fueled by raw strength and primal fury; clerics, channeling divine powers to heal wounds and banish darkness; and many more archetypes, each poised to carve their mark in the annals of this epic saga. Your journey begins here – choose your character wisely, for the fate of the realm hangs upon the shoulders of your chosen champion.
+    </p>
+</div>
+<h4>Class Generator</h4>
 <select @bind="SelectedOption">
-    <option value="">Select a monster</option>
+    <option value="">Select a Class</option>
     @foreach (var class1 in Classes)
     {
         <option value="@class1.index">@class1.name</option>
@@ -57,17 +53,16 @@
     }
 </select>
 
+<div class="textdnd">
+    <h3>Details of selected Character</h3>
 @if (SelectedOption != null)
 {
-    <h3>Details of Selected Class</h3>
     <p>Primary Class: @SelectedOption</p>
     <p>Primary Skill: @SelectedSkill</p>
     <p>Race: @SelectedRace</p>
-    <!-- Display additional details of the selected class as needed -->
+    
 }
-
-
-
+</div>
 
 
 
